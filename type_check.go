@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
-type Value struct {
+type Object struct {
 	rlType int //值类型: 左值、右值
 	vConst interface{} //如果是左值，则从当前环境中取值，如果是右值，则从这里取值
 	symbol string
@@ -14,23 +15,23 @@ type Value struct {
 
 //一些常量池
 var (
-	valueTrue = &Value{
+	valueTrue = &Object{
 		rlType:RightValue,
 		vConst: true,
 	}
 
-	valueFalse = &Value{
+	valueFalse = &Object{
 		rlType:RightValue,
 		vConst: false,
 	}
 )
 
-func (v *Value)String() string {
+func (v *Object)String() string {
 	return fmt.Sprintf("rtype:%d,vconst:%+v,vtype:%d",v.rlType,v.vConst,v.vType)
 }
 
-func (v *Value)Add(v1 *Value)*Value {
-	value := &Value{}
+func (v *Object)Add(v1 *Object)*Object {
+	value := &Object{}
 	value.rlType = RightValue
 	switch reflect.TypeOf(v.vConst).Kind() {
 	case reflect.String:
@@ -71,8 +72,8 @@ func (v *Value)Add(v1 *Value)*Value {
 	return value
 }
 
-func (v *Value)Sub(v1 *Value)*Value {
-	value := &Value{}
+func (v *Object)Sub(v1 *Object)*Object {
+	value := &Object{}
 	value.rlType = RightValue
 	switch reflect.TypeOf(v.vConst).Kind() {
 	case reflect.String:
@@ -110,8 +111,8 @@ func (v *Value)Sub(v1 *Value)*Value {
 	return value
 }
 
-func (v *Value)Mul(v1 *Value)*Value {
-	value := &Value{}
+func (v *Object)Mul(v1 *Object)*Object {
+	value := &Object{}
 	value.rlType = RightValue
 	switch reflect.TypeOf(v.vConst).Kind() {
 	case reflect.String:
@@ -149,8 +150,8 @@ func (v *Value)Mul(v1 *Value)*Value {
 	return value
 }
 
-func (v *Value)Div(v1 *Value)*Value {
-	value := &Value{}
+func (v *Object)Div(v1 *Object)*Object {
+	value := &Object{}
 	value.rlType = RightValue
 	switch reflect.TypeOf(v.vConst).Kind() {
 	case reflect.String:
@@ -191,8 +192,8 @@ func (v *Value)Div(v1 *Value)*Value {
 }
 
 //v < v1 ?
-func (v *Value)Less(v1 *Value)*Value {
-	value := &Value{}
+func (v *Object)Less(v1 *Object)*Object {
+	value := &Object{}
 	value.rlType = RightValue
 	switch reflect.TypeOf(v.vConst).Kind() {
 	case reflect.String:
@@ -237,8 +238,8 @@ func (v *Value)Less(v1 *Value)*Value {
 }
 
 //v <= v1
-func (v *Value)LessEq(v1 *Value)*Value {
-	value := &Value{}
+func (v *Object)LessEq(v1 *Object)*Object {
+	value := &Object{}
 	value.rlType = RightValue
 	switch reflect.TypeOf(v.vConst).Kind() {
 	case reflect.String:
@@ -283,8 +284,8 @@ func (v *Value)LessEq(v1 *Value)*Value {
 }
 
 //v > v1
-func (v *Value)Greater(v1 *Value)*Value {
-	value := &Value{}
+func (v *Object)Greater(v1 *Object)*Object {
+	value := &Object{}
 	value.rlType = RightValue
 	switch reflect.TypeOf(v.vConst).Kind() {
 	case reflect.String:
@@ -329,8 +330,8 @@ func (v *Value)Greater(v1 *Value)*Value {
 }
 
 //v >= v1
-func (v *Value)GreaterEq(v1 *Value)*Value {
-	value := &Value{}
+func (v *Object)GreaterEq(v1 *Object)*Object {
+	value := &Object{}
 	value.rlType = RightValue
 	switch reflect.TypeOf(v.vConst).Kind() {
 	case reflect.String:
@@ -375,8 +376,8 @@ func (v *Value)GreaterEq(v1 *Value)*Value {
 }
 
 //v == v1
-func (v *Value)Equal(v1 *Value)*Value {
-	value := &Value{}
+func (v *Object)Equal(v1 *Object)*Object {
+	value := &Object{}
 	value.rlType = RightValue
 	switch reflect.TypeOf(v.vConst).Kind() {
 	case reflect.String:
@@ -429,8 +430,8 @@ func (v *Value)Equal(v1 *Value)*Value {
 }
 
 //v != v1
-func (v *Value)NotEqual(v1 *Value)*Value {
-	value := &Value{}
+func (v *Object)NotEqual(v1 *Object)*Object {
+	value := &Object{}
 	value.rlType = RightValue
 	switch reflect.TypeOf(v.vConst).Kind() {
 	case reflect.String:
@@ -481,8 +482,8 @@ func (v *Value)NotEqual(v1 *Value)*Value {
 	return value
 }
 
-func (v *Value)And(v1 *Value)*Value {
-	value := &Value{}
+func (v *Object)And(v1 *Object)*Object {
+	value := &Object{}
 	value.rlType = RightValue
 	switch reflect.TypeOf(v.vConst).Kind() {
 	case reflect.String:
@@ -500,8 +501,8 @@ func (v *Value)And(v1 *Value)*Value {
 	return value
 }
 
-func (v *Value)Or(v1 *Value)*Value {
-	value := &Value{}
+func (v *Object)Or(v1 *Object)*Object {
+	value := &Object{}
 	value.rlType = RightValue
 	switch reflect.TypeOf(v.vConst).Kind() {
 	case reflect.String:
@@ -517,4 +518,23 @@ func (v *Value)Or(v1 *Value)*Value {
 		}
 	}
 	return value
+}
+
+func TriggerMethod(mmethod string,args []*Object)*Object{
+	var module string
+	var function string
+	arr := strings.Split(mmethod,".")
+	if len(arr) != 2 {
+		panic("invalid method call")
+	}
+
+	module = arr[0]
+	function = arr[1]
+
+	if mod, ok := StandardModule[module];ok {
+		if f, ok := mod.Funcs[function]; ok {
+			return f.F(args...)
+		}
+	}
+	panic("undefine method")
 }
