@@ -17,6 +17,12 @@ type V2ParserVisitor interface {
 	// Visit a parse tree produced by V2ParserParser#statement.
 	VisitStatement(ctx *StatementContext) interface{}
 
+	// Visit a parse tree produced by V2ParserParser#forStmt.
+	VisitForStmt(ctx *ForStmtContext) interface{}
+
+	// Visit a parse tree produced by V2ParserParser#importStmt.
+	VisitImportStmt(ctx *ImportStmtContext) interface{}
+
 	// Visit a parse tree produced by V2ParserParser#declaration.
 	VisitDeclaration(ctx *DeclarationContext) interface{}
 
@@ -52,6 +58,12 @@ type V2ParserVisitor interface {
 
 	// Visit a parse tree produced by V2ParserParser#expressionList.
 	VisitExpressionList(ctx *ExpressionListContext) interface{}
+
+	// Visit a parse tree produced by V2ParserParser#keyValue.
+	VisitKeyValue(ctx *KeyValueContext) interface{}
+
+	// Visit a parse tree produced by V2ParserParser#keyValues.
+	VisitKeyValues(ctx *KeyValuesContext) interface{}
 
 	// Visit a parse tree produced by V2ParserParser#expression.
 	VisitExpression(ctx *ExpressionContext) interface{}

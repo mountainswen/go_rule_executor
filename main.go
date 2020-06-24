@@ -25,6 +25,11 @@ var ifStmt = `
 
 var methodcall = `
  ss = fmt.sprintf("hello:%s","mikewen")
+tt = time.now()
+i = 12
+for (i = 2.1; i < 20;i=i+1) {
+	tt = time.now()
+}
 `
 func main() {
 	var a = []rune("12313")

@@ -20,6 +20,14 @@ func (v *BaseV2ParserVisitor) VisitStatement(ctx *StatementContext) interface{} 
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseV2ParserVisitor) VisitForStmt(ctx *ForStmtContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseV2ParserVisitor) VisitImportStmt(ctx *ImportStmtContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseV2ParserVisitor) VisitDeclaration(ctx *DeclarationContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -65,6 +73,14 @@ func (v *BaseV2ParserVisitor) VisitBlock(ctx *BlockContext) interface{} {
 }
 
 func (v *BaseV2ParserVisitor) VisitExpressionList(ctx *ExpressionListContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseV2ParserVisitor) VisitKeyValue(ctx *KeyValueContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseV2ParserVisitor) VisitKeyValues(ctx *KeyValuesContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

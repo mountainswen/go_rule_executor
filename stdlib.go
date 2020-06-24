@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 //标准库
 type function func(args ...*Object)*Object
@@ -46,11 +49,48 @@ var fmtModule = &Module{
 
 		//printf
 		"printf":{
+			F: func(args ...*Object) *Object {
+				if len(args) < 2 {
 
+				}
+				format,_ := args[0].vConst.(string)
+
+				arg := []interface{}{}
+				for _, a := range args[1:] {
+					arg = append(arg,a.vConst)
+				}
+				fmt.Printf(format,arg...)
+				return &Object{
+					vConst: "",
+					rlType: RightValue,
+				}
+			},
 		},
 	},
 }
 
+var timeModule = &Module{
+	Name: "time",
+	Desc: "系统时间模块",
+	Funcs: map[string]StdFunction{
+		//time.now
+		"now":{
+			F: func(args ...*Object) *Object {
+				ts := time.Now().Unix()
+				return &Object{
+					vConst: ts,
+					rlType: RightValue,
+				}
+			},
+		},
+
+		//printf
+		"printf":{
+
+		},
+	},
+}
 func init(){
 	Register("fmt",fmtModule)
+	Register("time",timeModule)
 }

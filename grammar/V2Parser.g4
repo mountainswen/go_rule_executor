@@ -11,9 +11,19 @@ statementList
 
 statement
     :declaration
+    |importStmt
     |assignStatement
     |expressionStmt
     |ifStmt
+    |forStmt
+    ;
+
+forStmt
+    : FOR L_PAREN assignStatement SEMI expression SEMI assignStatement R_PAREN  block  //循环语句
+    ;
+
+importStmt
+    :IMPORT L_PAREN IDENTIFIER R_PAREN
     ;
 
 //声明语句
@@ -43,7 +53,7 @@ typeName
 
 //赋值语句
 assignStatement
-    :expressionList assign_op expressionList
+    :expressionList (assign_op | DECLARE_ASSIGN) expressionList
     ;
 
 assign_op
@@ -64,6 +74,14 @@ block
 
 expressionList
     :expression (COMMA expression)*
+    ;
+
+keyValue
+    :(integer|string_) COLON expression
+    ;
+
+keyValues
+    : keyValue (COMMA keyValue)*
     ;
 
 //表达式
@@ -94,6 +112,7 @@ operand
     | operandName
     | methodExpr
     | L_PAREN expression R_PAREN
+    | L_CURLY (expressionList | keyValues) R_CURLY
     ;
 
 literal
@@ -139,7 +158,7 @@ receiverType
     ;
 
 arguments
-    : L_PAREN expressionList R_PAREN
+    : L_PAREN expressionList? R_PAREN
     ;
 
 eos
