@@ -24,7 +24,7 @@ func Register(name string,module *Module){
 }
 
 var fmtModule = &Module{
-	Name: "fmt",
+	Name: "io",
 	Desc: "格式化标准库",
 	Funcs: map[string]StdFunction{
 		//sprintf
@@ -48,18 +48,15 @@ var fmtModule = &Module{
 		},
 
 		//printf
-		"printf":{
+		"print":{
 			F: func(args ...*Object) *Object {
-				if len(args) < 2 {
-
-				}
-				format,_ := args[0].vConst.(string)
+				//format,_ := args[0].vConst.(string)
 
 				arg := []interface{}{}
-				for _, a := range args[1:] {
+				for _, a := range args[0:] {
 					arg = append(arg,a.vConst)
 				}
-				fmt.Printf(format,arg...)
+				fmt.Println(arg...)
 				return &Object{
 					vConst: "",
 					rlType: RightValue,
@@ -83,14 +80,9 @@ var timeModule = &Module{
 				}
 			},
 		},
-
-		//printf
-		"printf":{
-
-		},
 	},
 }
-func init(){
-	Register("fmt",fmtModule)
+func init() {
+	Register("io",fmtModule)
 	Register("time",timeModule)
 }

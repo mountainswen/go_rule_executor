@@ -520,7 +520,7 @@ func (v *Object)Or(v1 *Object)*Object {
 	return value
 }
 
-func TriggerMethod(mmethod string,args []*Object)*Object{
+func TriggerMethod(mmethod string,args interface{})*Object{
 	var module string
 	var function string
 	arr := strings.Split(mmethod,".")
@@ -531,10 +531,18 @@ func TriggerMethod(mmethod string,args []*Object)*Object{
 	module = arr[0]
 	function = arr[1]
 
+	realArgs, ok := args.([]*Object)
+	if !ok {
+		realArgs = []*Object{}
+	}
+
 	if mod, ok := StandardModule[module];ok {
 		if f, ok := mod.Funcs[function]; ok {
-			return f.F(args...)
+			return f.F(realArgs...)
 		}
 	}
-	panic("undefine method")
+	//panic("undefine method")
+	return &Object{
+		vConst: "undefined method:"+mmethod,
+	}
 }

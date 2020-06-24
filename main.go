@@ -3,7 +3,6 @@ package main
 
 import (
 	"antlr_test/parserV1"
-	"fmt"
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 
 	"antlr_test/V2parser"
@@ -24,18 +23,25 @@ var ifStmt = `
 `
 
 var methodcall = `
- ss = fmt.sprintf("hello:%s","mikewen")
+ ss = io.sprintf("hello:%s","mikewen")
 tt = time.now()
 i = 12
-for (i = 2.1; i < 20;i=i+1) {
+i = "hello world"
+for (i = 2.1; i < 20; i=i+1) {
 	tt = time.now()
+    io.print("i:",i)
 }
+io.print(tt)
+io.print(ss)
+io.print(i)
 `
+
 func main() {
-	var a = []rune("12313")
-	fmt.Println(a[0])
+//	var a = []rune("12313")
+//	fmt.Println(a[0])
 	// Setup the input
-	calc(methodcall)
+	//calc(methodcall)
+	Start()
 }
 
 func V1(){

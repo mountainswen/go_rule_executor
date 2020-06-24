@@ -29,6 +29,10 @@ func NewVisitor()*VisitorImpl{
 	return v
 }
 
+func (v *VisitorImpl)SetEnv(env *Enviroment){
+	v.env = env
+}
+
 func (v *VisitorImpl)PrintEnv(){
 	fmt.Printf("%+v\n",v.env)
 }
@@ -38,23 +42,23 @@ func (v *VisitorImpl) VisitChild(node antlr.RuleNode) interface{} {
 }
 
 func (v *VisitorImpl) VisitSourceFile(ctx *parser.SourceFileContext) interface{} {
-	fmt.Println("visit source file")
+	//fmt.Println("visit source file")
 	stmtList := ctx.StatementList()
 	return v.VisitChild(stmtList)
 }
 
 func (v *VisitorImpl) VisitStatementList(ctx *parser.StatementListContext) interface{} {
-	fmt.Println("enter visit StatementList")
+	//fmt.Println("enter visit StatementList")
 	for _, stmt := range ctx.AllStatement() {
 		v.VisitChild(stmt) //stmt没有返回值
 	}
 
-	fmt.Println("exist visit StatementList")
+	//fmt.Println("exist visit StatementList")
 	return nil
 }
 
 func (v *VisitorImpl) VisitStatement(ctx *parser.StatementContext) interface{} {
-	fmt.Println("enter visit VisitStatement")
+	//fmt.Println("enter visit VisitStatement")
 
 	if ctx.AssignStatement() != nil {
 		return v.VisitChild(ctx.AssignStatement())
@@ -69,7 +73,7 @@ func (v *VisitorImpl) VisitStatement(ctx *parser.StatementContext) interface{} {
 	} else if ctx.ImportStmt() != nil {
 		return v.VisitChild(ctx.ImportStmt())
 	} else {
-		panic("undefine statement")
+		//panic("undefine statement")
 	}
 
 	return nil
@@ -80,9 +84,9 @@ func (v *VisitorImpl) VisitExpressionStmt(ctx *parser.ExpressionStmtContext) int
 }
 
 func (v *VisitorImpl) VisitAssignStatement(ctx *parser.AssignStatementContext) interface{} {
-	fmt.Println("enter visit VisitAssignStatement")
+	//fmt.Println("enter visit VisitAssignStatement")
 	if len(ctx.AllExpressionList()) != 2 {
-		fmt.Println("invalid assignment statement")
+		//fmt.Println("invalid assignment statement")
 	}
 
 	left := v.VisitChild(ctx.AllExpressionList()[0])
@@ -91,24 +95,24 @@ func (v *VisitorImpl) VisitAssignStatement(ctx *parser.AssignStatementContext) i
 	//判断left是否是左值
 	lvalues, ok := left.([]*Object)
 	if !ok {
-		panic("iiii")
+		//panic("iiii")
 	}
-	fmt.Printf("lvalue:%+v\n",lvalues)
+	//fmt.Printf("lvalue:%+v\n",lvalues)
 
 	//求right的个个表达式的值
 	rvalues, ok := right.([]*Object)
 	if !ok {
-		fmt.Println("invalid right value")
+		//("invalid right value")
 		return nil
 	}
-	fmt.Printf("rvalue:%+v\n",rvalues)
+	//fmt.Printf("rvalue:%+v\n",rvalues)
 	if len(lvalues) != len(rvalues) {
-		panic("rvalue.len != rvalue.len")
+		//panic("rvalue.len != rvalue.len")
 	}
 
 	for i,lv := range lvalues {
 		if lv.rlType != LeftValue {
-			panic("need left value!")
+			//panic("need left value!")
 		}
 		v.env.SetSymbol(lv.symbol,rvalues[i])
 		//v.env[lv.symbol] = rvalues[i]
@@ -122,7 +126,7 @@ func (v *VisitorImpl) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 	defer v.env.Shrink()
 
 	if len(ctx.AllAssignStatement()) != 2 {
-		panic("len(ctx.AllAssignStatement()) != 2")
+		//panic("len(ctx.AllAssignStatement()) != 2")
 	}
 
 	init := ctx.AssignStatement(0)
@@ -157,13 +161,13 @@ func (v *VisitorImpl) VisitForStmt(ctx *parser.ForStmtContext) interface{} {
 
 
 func (v *VisitorImpl) VisitAssign_op(ctx *parser.Assign_opContext) interface{} {
-	fmt.Println("enter visit VisitAssign_op")
+	//fmt.Println("enter visit VisitAssign_op")
 
 	return nil
 }
 
 func (v *VisitorImpl) VisitExpressionList(ctx *parser.ExpressionListContext) interface{} {
-	fmt.Println("enter visit VisitExpressionList")
+	//fmt.Println("enter visit VisitExpressionList")
 	var values []*Object
 	for _, expr := range ctx.AllExpression() {
 		vs := v.VisitChild(expr).(*Object)
@@ -174,7 +178,7 @@ func (v *VisitorImpl) VisitExpressionList(ctx *parser.ExpressionListContext) int
 }
 
 func (v *VisitorImpl) VisitExpression(ctx *parser.ExpressionContext) interface{} {
-	fmt.Println("enter visit VisitExpression")
+	//fmt.Println("enter visit VisitExpression")
 	if len(ctx.AllExpression()) > 0 {
 		left := v.VisitChild(ctx.Expression(0)).(*Object)
 		right := v.VisitChild(ctx.Expression(1)).(*Object)
@@ -230,19 +234,19 @@ func (v *VisitorImpl) VisitExpression(ctx *parser.ExpressionContext) interface{}
 }
 
 func (v *VisitorImpl) VisitPrimaryExpr(ctx *parser.PrimaryExprContext) interface{} {
-	fmt.Println("enter visit VisitPrimaryExpr")
+	//fmt.Println("enter visit VisitPrimaryExpr")
 
 	if ctx.Operand() != nil {
 		return v.VisitChild(ctx.Operand()).(*Object)
 	}
 
 	if ctx.Arguments() != nil {
-		fmt.Println(ctx.Arguments().GetText())
+		//fmt.Println(ctx.Arguments().GetText())
 	}
 
 	//method call
 	if ctx.Arguments() != nil {
-		fmt.Println("enter method call")
+		//fmt.Println("enter method call")
 		args := v.VisitChild(ctx.Arguments())
 		methodCall := ctx.PrimaryExpr().GetText()
 		return TriggerMethod(methodCall,args)
@@ -266,7 +270,7 @@ func (v *VisitorImpl) VisitArguments(ctx *parser.ArgumentsContext) interface{} {
 }
 
 func (v *VisitorImpl) VisitOperand(ctx *parser.OperandContext) interface{} {
-	fmt.Println("enter visit VisitOperand")
+	//fmt.Println("enter visit VisitOperand")
 	if ctx.OperandName() != nil {
 		return v.VisitChild(ctx.OperandName()).(*Object)
 	}
@@ -278,18 +282,18 @@ func (v *VisitorImpl) VisitOperand(ctx *parser.OperandContext) interface{} {
 	}
 
 	if ctx.MethodExpr() != nil {
-		panic("unsuppot")
+		//("unsuppot")
 	}
 	return nil
 }
 
 func (v *VisitorImpl) VisitLiteral(ctx *parser.LiteralContext) interface{} {
-	fmt.Println("enter visit VisitLiteral")
+	//fmt.Println("enter visit VisitLiteral")
 	return v.VisitChild(ctx.BasicLit()).(*Object)
 }
 
 func (v *VisitorImpl) VisitBasicLit(ctx *parser.BasicLitContext) interface{} {
-	fmt.Println("enter visit VisitBasicLit")
+	//fmt.Println("enter visit VisitBasicLit")
 	if ctx.Integer() != nil { //整型
 		return v.VisitChild(ctx.Integer())
 	}
@@ -310,7 +314,7 @@ func (v *VisitorImpl) VisitBasicLit(ctx *parser.BasicLitContext) interface{} {
 }
 
 func (v *VisitorImpl) VisitOperandName(ctx *parser.OperandNameContext) interface{} {
-	fmt.Println("enter visit VisitOperandName")
+	//("enter visit VisitOperandName")
 	if ctx.IDENTIFIER() != nil {
 		txt := ctx.GetText()
 		value := &Object{}
@@ -332,7 +336,7 @@ func (v *VisitorImpl) VisitOperandName(ctx *parser.OperandNameContext) interface
 }
 
 func (v *VisitorImpl) VisitInteger(ctx *parser.IntegerContext) interface{} {
-	fmt.Println("enter visit VisitInteger")
+	//("enter visit VisitInteger")
 	txt := ctx.GetText()
 	value := &Object{}
 	value.rlType = 1
@@ -373,12 +377,12 @@ func (v *VisitorImpl) VisitIfStmt(ctx *parser.IfStmtContext) interface{} {
 
 	cond := ctx.Expression()
 	if cond == nil {
-		panic("")
+		//panic("")
 	}
 
 	condition,_ := v.VisitChild(cond).(*Object)
 	if reflect.TypeOf(condition.vConst).Kind() != reflect.Bool {
-		panic("need bool")
+		//panic("need bool")
 	}
 
 	val := condition.vConst.(bool)
