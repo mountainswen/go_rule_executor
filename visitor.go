@@ -110,12 +110,20 @@ func (v *VisitorImpl) VisitAssignStatement(ctx *parser.AssignStatementContext) i
 		//panic("rvalue.len != rvalue.len")
 	}
 
+	newVar := false
+	 if ctx.DECLARE_ASSIGN() != nil {
+		 newVar = true
+	 }
 	for i,lv := range lvalues {
 		if lv.rlType != LeftValue {
-			//panic("need left value!")
+			panic("need left value!")
 		}
-		v.env.SetSymbol(lv.symbol,rvalues[i])
-		//v.env[lv.symbol] = rvalues[i]
+
+		if symbol,ok := v.env.GetSymbol(lv.symbol); !ok || newVar {
+			v.env.SetSymbol(lv.symbol,rvalues[i])
+		} else {
+			*symbol = *rvalues[i]
+		}
 	}
 
 	return nil
@@ -256,8 +264,21 @@ func (v *VisitorImpl) VisitPrimaryExpr(ctx *parser.PrimaryExprContext) interface
 	if ctx.DOT() != nil && ctx.IDENTIFIER() != nil {
 
 	}
+
+	//
+	if ctx.Index() != nil {
+		compound,_ := v.VisitChild(ctx.PrimaryExpr()).(*Object)
+		index,_ := v.VisitChild(ctx.Index()).(*Object)
+
+		return compound.Index(index)
+	}
+
 	//fmt.Printf("%s,%s\n",ctx.DOT().GetText())
 	return nil
+}
+
+func (v *VisitorImpl) VisitIndex(ctx *parser.IndexContext) interface{} {
+	return v.VisitChild(ctx.Expression())
 }
 
 func (v *VisitorImpl) VisitArguments(ctx *parser.ArgumentsContext) interface{} {
@@ -279,6 +300,20 @@ func (v *VisitorImpl) VisitOperand(ctx *parser.OperandContext) interface{} {
 	}
 	if ctx.Expression() != nil {
 		return v.VisitChild(ctx.Expression())
+	}
+
+	//{1,2,3},{1:2,3:4}
+	if ctx.L_CURLY() != nil {
+		//array
+		var ret = &Object{}
+		if ctx.ExpressionList() != nil {
+			values := v.VisitChild(ctx.ExpressionList())
+			ret.vConst = values
+			return ret
+		}
+		if ctx.KeyValues() != nil {
+			panic("unsupport dict")
+		}
 	}
 
 	if ctx.MethodExpr() != nil {

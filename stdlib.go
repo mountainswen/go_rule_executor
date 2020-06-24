@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"time"
 )
 
@@ -82,7 +83,66 @@ var timeModule = &Module{
 		},
 	},
 }
+
+var typeModule = &Module{
+	Name: "std",
+	Desc: "类型模块",
+	Funcs: map[string]StdFunction{
+		//time.now
+		"len":{
+			F: func(args ...*Object) *Object {
+				if len(args) != 1 {
+					panic("invalid type.len usage")
+				}
+
+				v := args[0].vConst
+				var vv int64
+				switch reflect.TypeOf(v).Kind() {
+				case reflect.String:
+					vv = int64(len(v.(string)))
+				case reflect.Slice:
+					vv = int64(len(v.([]*Object)))
+				default:
+					panic("unsupport type.len for type:%v")
+				}
+
+				return &Object{
+					vConst: vv,
+					rlType: RightValue,
+				}
+			},
+		},
+		"typeof":{
+			F: func(args ...*Object) *Object {
+				if len(args) != 1 {
+					panic("invalid std.type usage")
+				}
+
+				v := args[0].vConst
+				var vv string
+				switch reflect.TypeOf(v).Kind() {
+				case reflect.String:
+					vv = "str"
+				case reflect.Int64,reflect.Int:
+					vv = "integer"
+				case reflect.Slice:
+					vv = "list"
+				default:
+					panic("undefined type")
+				}
+
+				return &Object{
+					vConst: vv,
+					rlType: RightValue,
+				}
+			},
+		},
+	},
+}
+
+
 func init() {
 	Register("io",fmtModule)
 	Register("time",timeModule)
+	Register("std",typeModule)
 }

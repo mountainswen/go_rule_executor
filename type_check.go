@@ -31,6 +31,17 @@ func (v *Object)String() string {
 }
 
 func (v *Object)Add(v1 *Object)*Object {
+	if v.vConst == nil {
+		return &Object{
+			vConst: "undefine variable:"+v.symbol,
+		}
+	}
+	if v1.vConst == nil {
+		return &Object{
+			vConst: "undefine variable:"+v1.symbol,
+		}
+	}
+
 	value := &Object{}
 	value.rlType = RightValue
 	switch reflect.TypeOf(v.vConst).Kind() {
@@ -525,7 +536,7 @@ func TriggerMethod(mmethod string,args interface{})*Object{
 	var function string
 	arr := strings.Split(mmethod,".")
 	if len(arr) != 2 {
-		panic("invalid method call")
+		panic("invalid method call:"+mmethod)
 	}
 
 	module = arr[0]
@@ -545,4 +556,19 @@ func TriggerMethod(mmethod string,args interface{})*Object{
 	return &Object{
 		vConst: "undefined method:"+mmethod,
 	}
+}
+
+func (o1 *Object)Index(idx *Object)*Object {
+	if o1arr,ok := o1.vConst.([]*Object);ok {
+		if index, ok := idx.vConst.(int64); ok && len(o1arr) - 1 >= int(index) {
+			return o1arr[int(index)] //不支持修改数组里的值
+		} else if len(o1arr) - 1 < int(index){
+			panic("index out of range")
+		} else {
+			panic("undefined index operator")
+		}
+	}else {
+		panic("undefine index operator")
+	}
+	return nil
 }

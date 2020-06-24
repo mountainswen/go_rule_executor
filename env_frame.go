@@ -37,13 +37,16 @@ func (e *Enviroment)GetSymbol(name string)(*Object,bool){
 		return nil,false
 	}
 
-	frame := e.frames[e.cur]
-	if frame == nil {
-		return nil,false
-	}
+    //从内层作用域往外层找
+	for i := e.cur; i >=0; i-- {
+		frame := e.frames[i]
+		if frame == nil {
+			continue
+		}
 
-	if symbol, ok := frame.local[name]; ok {
-		return symbol,true
+		if symbol, ok := frame.local[name]; ok {
+			return symbol,true
+		}
 	}
 
 	return nil, false

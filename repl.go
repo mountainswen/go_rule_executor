@@ -4,6 +4,7 @@ import (
 	"antlr_test/V2parser"
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	"github.com/c-bata/go-prompt"
+	"os"
 )
 
 const PROMPT = ">>"
@@ -12,6 +13,10 @@ func Handle(input string) {
 	//scanner := bufio.NewScanner(in)
 		if len(input) == 0 {
 			return
+		}
+
+		if input == "exit" {
+			os.Exit(0)
 		}
 
 		var v = NewVisitor()

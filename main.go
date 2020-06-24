@@ -23,25 +23,30 @@ var ifStmt = `
 `
 
 var methodcall = `
- ss = io.sprintf("hello:%s","mikewen")
-tt = time.now()
-i = 12
-i = "hello world"
-for (i = 2.1; i < 20; i=i+1) {
-	tt = time.now()
-    io.print("i:",i)
-}
-io.print(tt)
-io.print(ss)
-io.print(i)
+  ss = io.sprintf("hello:%s","mikewen")
+ tt = time.now()
+ i = 12
+ i = "hello world"
+ a = {112,232,332,41,1,2,3,4,5,5,6,7,8,2,34,5,6,7,8,4,4,4,5,6}
+ for (i := 0; i < std.len(a); i=i+1) {
+   // j = i + 1
+   io.print("a[",i,"]:",a[i])
+	//tt = time.now()
+    //io.print("i:",i)
+ }
+ io.print("a",a[1])
+ io.print(std.len(a))
+ io.print(tt)
+ io.print(ss)
+ io.print(i)
 `
 
 func main() {
 //	var a = []rune("12313")
 //	fmt.Println(a[0])
 	// Setup the input
-	//calc(methodcall)
-	Start()
+	calc(methodcall)
+	//Start()
 }
 
 func V1(){
